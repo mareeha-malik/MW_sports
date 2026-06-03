@@ -1,0 +1,17 @@
+[
+    { "id": 0, "img": "/1.svg", "Title": "T-shirt", "desc": "Timeless design with a comfortable fit for all athletes", "rating": 4, "price": "2000" },
+    { "id": 1, "img": "/2.svg", "Title": "T-shirt", "desc": "Lightweight fabric for maximum breathability and movement.", "rating": 3, "price": "2600" },
+    { "id": 2, "img": "/3.svg", "Title": "T-shirt", "desc": "Form-fitting design that supports muscles", "rating": 5, "price": "2700" },
+    { "id": 3, "img": "/4.svg", "Title": "T-shirt", "desc": "Durable and moisture-wicking, ideal for intense workouts.", "rating": 2, "price": "2800" },
+    { "id": 4, "img": "/5.svg", "Title": "T-shirt", "desc": "Vintage look with modern comfort for a stylish twist.", "rating": 4, "price": "2000" },
+    { "id": 5, "img": "/6.svg", "Title": "T-shirt", "desc": "Freedom of movement and breathability for hot days.", "rating": 1, "price": "2500" },
+    { "id": 6, "img": "/7.svg", "Title": "T-shirt", "desc": "Support your team in style with this officially licensed jersey.", "rating": 5, "price": "2500" },
+    { "id": 7, "img": "/8.svg", "Title": "T-shirt", "desc": "Extra coverage and style for cooler game days", "rating": 3, "price": "2500" },
+    { "id":8, "img": "/9.svg", "Title": "T-shirt", "desc": "Perfectly sized for young athletes, combining style and comfort.", "rating": 4, "price": "2400" },
+    { "id": 9, "img": "/10.svg", "Title": "T-shirt", "desc": "Show your colors with this vibrant, customizable jersey.", "rating": 2, "price": "2200" },
+    { "id": 10, "img": "/11.svg", "Title": "T-shirt", "desc": "Stay cool with our moisture-wicking sports jersey!", "rating": 5, "price": "2000" },
+    { "id": 11, "img": "/Bats.svg", "Title": "Bat", "desc": "High-quality willow bat for power and precision", "rating": 5, "price": "2000" },
+    { "id": 12, "img": "/Gloves_1.svg", "Title": "Gloves", "desc": "Durable gloves for enhanced grip and comfort", "rating": 5, "price": "1500" },
+    { "id": 13, "img": "/Bag_3.svg", "Title": "Gears", "desc": "Spacious bag with compartments for all your gear", "rating": 5, "price": "1500" },
+    { "id": 14, "img": "/Shirt.svg", "Title": "T-shirt", "desc": "Form-fitting design that supports muscles", "rating": 4, "price": "1500" }
+]

@@ -1,0 +1,6 @@
+
+        .select
+        {
+            @apply cursor-pointer hover:bg-BrightOrange hover:text-white
+        
+        }
