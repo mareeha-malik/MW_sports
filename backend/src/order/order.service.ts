@@ -52,17 +52,18 @@ export class OrderService {
     totalAmount: number; 
     shippingAddress: string; 
     paymentMethod: string;
+    customerName: string;
     customerEmail: string;
     customerPhone: string;
   }): Promise<Order> {
-    const orderNumber = `ORD-${Date.now()}`;
     const order = this.orderRepository.create({
       ...body,
-      orderNumber,
       paymentStatus: PaymentStatus.PENDING,
       fulfillmentStatus: OrderStatus.PENDING,
     });
     const savedOrder = await this.orderRepository.save(order);
+    savedOrder.orderNumber = `ORD-${String(savedOrder.id).padStart(4, '0')}`;
+    await this.orderRepository.save(savedOrder);
 
     for (const item of body.items) {
       const orderItem = this.orderItemRepository.create({
@@ -82,11 +83,12 @@ export class OrderService {
         items: body.items,
         totalAmount: body.totalAmount,
         shippingAddress: body.shippingAddress,
+        customerName: body.customerName,
       };
       await this.emailService.sendOrderConfirmationEmail(
         body.customerEmail,
-        'Valued Customer',
-        orderNumber,
+        body.customerName || 'Valued Customer',
+        savedOrder.orderNumber,
         orderDetails
       );
     } catch (error) {
@@ -100,7 +102,7 @@ export class OrderService {
         userId: body.userId,
         type: NotificationType.ORDER_CONFIRMATION,
         title: 'Order Confirmed! 🎉',
-        message: `Your order #${orderNumber} has been received. We're processing it now.`,
+        message: `Your order #${savedOrder.orderNumber} has been received. We're processing it now.`,
         relatedOrderId: savedOrder.id,
         icon: '✅',
       });

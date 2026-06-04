@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "@/app/utils/api";
 import { TrendingUp, TrendingDown, Package, ShoppingBag, Users } from "lucide-react";
+import Link from "next/link";
 
 interface KPI {
   label: string;
@@ -18,11 +19,24 @@ interface ChartData {
   orders: number;
 }
 
+interface RecentOrder {
+  id: number;
+  orderNumber: string;
+  totalAmount: number;
+  paymentStatus: string;
+  fulfillmentStatus: string;
+  createdAt: string;
+  customerName?: string;
+  customerEmail?: string;
+  user?: { username: string; email: string };
+}
+
 export default function AdminDashboard() {
   const [kpis, setKpis] = useState<KPI[]>([]);
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(true);
   const [maxRevenue, setMaxRevenue] = useState(0);
+  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -77,6 +91,8 @@ export default function AdminDashboard() {
           revenue: Math.round(data.revenue),
           orders: data.count,
         }));
+
+        setRecentOrders(orders.slice(0, 3));
 
         const maxRev = Math.max(...chartDataArray.map((d) => d.revenue), 1);
         setMaxRevenue(maxRev);
@@ -294,11 +310,38 @@ export default function AdminDashboard() {
         <div className="bg-[#111] border border-[#222] rounded-xl p-6">
           <h2 className="text-lg font-semibold text-white mb-4">Recent Orders</h2>
           <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="p-3 bg-[#1a1a1a] rounded-lg text-sm text-gray-400 hover:bg-[#222] transition">
-                Order #{1000 + i}
+            {loading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-16 bg-[#1a1a1a] rounded-lg animate-pulse" />
+                ))}
               </div>
-            ))}
+            ) : recentOrders.length > 0 ? (
+              recentOrders.map((order) => (
+                <Link
+                  key={order.id}
+                  href={`/admin/orders/${order.id}`}
+                  className="block p-3 bg-[#1a1a1a] rounded-lg hover:bg-[#222] transition"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm text-white font-medium">{order.orderNumber}</p>
+                      <p className="text-xs text-gray-400">
+                        {order.customerName || order.user?.username || order.customerEmail || "Customer"}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-white">Rs {Number(order.totalAmount) || 0}</p>
+                      <p className="text-xs text-gray-400 capitalize">{order.fulfillmentStatus}</p>
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="p-3 bg-[#1a1a1a] rounded-lg text-sm text-gray-400">
+                No recent orders
+              </div>
+            )}
           </div>
         </div>
       </div>

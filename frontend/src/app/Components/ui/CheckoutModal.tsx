@@ -26,7 +26,6 @@ export default function CheckoutModal({
   const [orderNumber, setOrderNumber] = useState("");
 
   const [formData, setFormData] = useState(() => {
-    // Try to load pre-filled data from localStorage
     const email = typeof window !== "undefined" ? localStorage.getItem("email") : null;
     return {
       firstName: "",
@@ -36,7 +35,7 @@ export default function CheckoutModal({
       address: "",
       city: "",
       postalCode: "",
-      paymentMethod: "card",
+      paymentMethod: "cod",
     };
   });
 
@@ -58,35 +57,33 @@ export default function CheckoutModal({
 
     try {
       const shippingAddress = `${formData.address}, ${formData.city}, ${formData.postalCode}`;
-      
-      // Get user ID
+      const customerName = `${formData.firstName} ${formData.lastName}`.trim();
+
       let userId = null;
       if (isAuth) {
         const userIdStr = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
         userId = userIdStr ? parseInt(userIdStr) : null;
       }
 
-      // Format order items
       const orderItems = items.map((item) => ({
         productId: item.product?.id || item.id,
         quantity: item.quantity,
         price: item.product?.price || item.price,
       }));
 
-      // Create order
       const response = await axiosInstance.post("/order", {
         userId: userId || null,
         items: orderItems,
         totalAmount: total,
         shippingAddress,
-        paymentMethod: formData.paymentMethod,
+        paymentMethod: "cod",
+        customerName,
         customerEmail: formData.email,
         customerPhone: formData.phone,
       });
 
       setOrderNumber(response.data.orderNumber);
 
-      // Clear cart
       if (isAuth) {
         await axiosInstance.delete("/cart");
       } else {
@@ -96,7 +93,7 @@ export default function CheckoutModal({
       setStep(3);
       setTimeout(() => {
         onOrderSuccess();
-      }, 3000);
+      }, 2000);
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to place order. Please try again.");
     } finally {
@@ -109,7 +106,6 @@ export default function CheckoutModal({
   return (
     <div className="fixed inset-0 dark:bg-black/50 light:bg-white/30 flex items-center justify-center z-50 p-4">
       <div className="dark:bg-HeaderWalaBlack light:bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
         <div className="sticky top-0 dark:bg-HeaderWalaBlack light:bg-white dark:border-gray-700 light:border-[#E5E7EB] border-b p-6 flex justify-between items-center">
           <h2 className="text-2xl font-semibold dark:text-white light:text-[#1F2937]">
             {step === 1 && "Shipping Address"}
@@ -126,7 +122,6 @@ export default function CheckoutModal({
           )}
         </div>
 
-        {/* Step 1: Shipping Address */}
         {step === 1 && (
           <div className="p-6 space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -205,12 +200,11 @@ export default function CheckoutModal({
           </div>
         )}
 
-        {/* Step 2: Order Summary & Payment */}
         {step === 2 && (
           <div className="p-6 space-y-6">
-            <div className="bg-black/30 rounded-lg p-4 space-y-3">
-              <h3 className="text-white font-semibold">Shipping To:</h3>
-              <p className="text-gray-300 text-sm">
+            <div className="dark:bg-black/30 light:bg-[#F8FAFC] rounded-lg p-4 space-y-3 border dark:border-none light:border-[#E5E7EB]">
+              <h3 className="dark:text-white light:text-[#1F2937] font-semibold">Shipping To:</h3>
+              <p className="dark:text-gray-300 light:text-[#6B7280] text-sm">
                 {formData.firstName} {formData.lastName}
                 <br />
                 {formData.address}
@@ -221,11 +215,11 @@ export default function CheckoutModal({
               </p>
             </div>
 
-            <div className="bg-black/30 rounded-lg p-4 space-y-3">
-              <h3 className="text-white font-semibold">Order Items:</h3>
+            <div className="dark:bg-black/30 light:bg-[#F8FAFC] rounded-lg p-4 space-y-3 border dark:border-none light:border-[#E5E7EB]">
+              <h3 className="dark:text-white light:text-[#1F2937] font-semibold">Order Items:</h3>
               <div className="space-y-2 max-h-40 overflow-y-auto">
                 {items.map((item, idx) => (
-                  <div key={idx} className="flex justify-between text-sm text-gray-300">
+                  <div key={idx} className="flex justify-between text-sm dark:text-gray-300 light:text-[#6B7280]">
                     <span>
                       {item.product?.title || "Product"} × {item.quantity}
                     </span>
@@ -237,18 +231,12 @@ export default function CheckoutModal({
               </div>
             </div>
 
-            <div className="space-y-3">
-              <label className="text-white text-sm font-semibold">Payment Method</label>
-              <select
-                name="paymentMethod"
-                value={formData.paymentMethod}
-                onChange={handleInputChange}
-                className="w-full bg-black/30 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-BrightOrange"
-              >
-                <option value="card">Credit/Debit Card</option>
-                <option value="cod">Cash on Delivery</option>
-                <option value="bank">Bank Transfer</option>
-              </select>
+            <div className="space-y-2">
+              <div className="flex items-baseline justify-between">
+                <label className="text-sm font-semibold dark:text-white light:text-[#1F2937]">Payment Method</label>
+                <span className="text-sm font-medium dark:text-white light:text-[#1F2937]">Cash on Delivery</span>
+              </div>
+              <p className="text-xs dark:text-gray-400 light:text-[#6B7280]">Only Cash on Delivery available for now</p>
             </div>
 
             <div className="border-t border-gray-700 pt-4">
@@ -279,21 +267,18 @@ export default function CheckoutModal({
           </div>
         )}
 
-        {/* Step 3: Order Confirmation */}
         {step === 3 && (
           <div className="p-6 text-center space-y-6">
             <div className="text-6xl">✓</div>
             <div className="space-y-2">
-              <h3 className="text-2xl font-semibold text-white">Order Placed!</h3>
-              <p className="text-gray-400">Thank you for your order.</p>
+              <h3 className="text-2xl font-semibold dark:text-white">Order Placed!</h3>
+              <p className="dark:text-gray-400">Thank you for your order.</p>
             </div>
-            <div className="bg-black/30 rounded-lg p-4 space-y-2">
-              <p className="text-gray-400 text-sm">Order Number</p>
-              <p className="text-white text-lg font-semibold">{orderNumber}</p>
+            <div className="dark:bg-black/30 light:bg-[#F8FAFC] rounded-lg p-4 space-y-2 border dark:border-none light:border-[#E5E7EB]">
+              <p className="dark:text-gray-400 light:text-[#6B7280] text-sm">Order Number</p>
+              <p className="dark:text-white light:text-[#1F2937] text-lg font-semibold">{orderNumber}</p>
             </div>
-            <p className="text-gray-400 text-sm">
-              A confirmation email has been sent to {formData.email}
-            </p>
+            <p className="dark:text-gray-400 text-sm">A confirmation email has been sent to {formData.email}</p>
             <p className="text-gray-500 text-xs">Redirecting...</p>
           </div>
         )}

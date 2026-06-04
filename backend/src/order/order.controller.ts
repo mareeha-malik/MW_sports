@@ -32,7 +32,7 @@ export class OrderController {
   }
 
   @Post()
-  async create(@Body() body: { userId?: number; items: { productId: number; quantity: number; price: number }[]; totalAmount: number; shippingAddress: string; paymentMethod: string; customerEmail: string; customerPhone: string }): Promise<Order> {
+  async create(@Body() body: { userId?: number; items: { productId: number; quantity: number; price: number }[]; totalAmount: number; shippingAddress: string; paymentMethod: string; customerName: string; customerEmail: string; customerPhone: string }): Promise<Order> {
     return this.orderService.create(body);
   }
 

@@ -16,6 +16,13 @@ import { NotificationModule } from './notification/notification.module';
 import * as dotenv from 'dotenv';
 dotenv.config();
 const isProduction = process.env.NODE_ENV === 'production';
+const parsedDatabaseUrl = process.env.DATABASE_URL ? new URL(process.env.DATABASE_URL) : undefined;
+const databaseHost = process.env.DB_HOST || 'ep-sweet-sea-a16w6jvz.ap-southeast-1.aws.neon.tech';
+const useDatabaseUrl = isProduction || process.env.DB_USE_URL === 'true';
+const useSsl = process.env.DB_SSL === 'true' || databaseHost !== 'localhost' && databaseHost !== '127.0.0.1' || useDatabaseUrl;
+const databaseUsername = process.env.DB_USERNAME || parsedDatabaseUrl?.username || 'MW-Sports_owner';
+const databasePassword = process.env.DB_PASSWORD || parsedDatabaseUrl?.password || 'oFXd1wu5cbla';
+const databaseName = process.env.DB_NAME || parsedDatabaseUrl?.pathname.replace(/^\//, '') || 'MW-Sports';
 @Module({
   imports: [
     // ServeStaticModule.forRoot({
@@ -24,17 +31,15 @@ const isProduction = process.env.NODE_ENV === 'production';
     // }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      url: process.env.DATABASE_URL,
-      host: process.env.DATABASE_URL
-        ? undefined
-        : process.env.DB_HOST || 'ep-sweet-sea-a16w6jvz.ap-southeast-1.aws.neon.tech',
-      port: process.env.DATABASE_URL ? undefined : parseInt(process.env.DB_PORT, 10) || 5432,
-      username: process.env.DATABASE_URL ? undefined : process.env.DB_USERNAME || 'MW-Sports_owner',
-      password: process.env.DATABASE_URL ? undefined : process.env.DB_PASSWORD || 'oFXd1wu5cbla',
-      database: process.env.DATABASE_URL ? undefined : process.env.DB_NAME || 'MW-Sports',
+      url: useDatabaseUrl ? process.env.DATABASE_URL : undefined,
+      host: useDatabaseUrl ? undefined : databaseHost,
+      port: useDatabaseUrl ? undefined : parseInt(process.env.DB_PORT, 10) || 5432,
+      username: useDatabaseUrl ? undefined : databaseUsername,
+      password: useDatabaseUrl ? undefined : databasePassword,
+      database: useDatabaseUrl ? undefined : databaseName,
       autoLoadEntities: true,
       synchronize: !isProduction,
-      ssl: isProduction ? { rejectUnauthorized: false } : false,
+      ssl: useSsl ? { rejectUnauthorized: false } : false,
       retryAttempts: 3,
       retryDelay: 2000,
       logging: ['error'],

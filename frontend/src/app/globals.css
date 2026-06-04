@@ -26,6 +26,9 @@
   html.light [class*="bg-HeaderWalaBlack"],
   html.light [class*="bg-\[#0a0a0a\]"],
   html.light [class*="bg-\[#111\]"],
+  html.light [class*="bg-\[#1a1a1a\]"],
+  html.light [class*="bg-\[#1e1e1e\]"],
+  html.light [class*="bg-\[#222\]"],
   html.light [class*="bg-\[#1C1C1C\]"],
   html.light [class*="bg-\[#000\]"] {
     @apply bg-white;
@@ -51,6 +54,7 @@
 
   /* Border Colors - Light Mode */
   html.light [class*="border-\[#222\]"],
+  html.light [class*="border-\[#1a1a1a\]"],
   html.light [class*="border-\[#333\]"],
   html.light [class*="border-gray-800"],
   html.light [class*="border-white/10"],
@@ -63,10 +67,31 @@
   html.light [class*="hover:bg-white/5"],
   html.light [class*="hover:bg-white/10"],
   html.light [class*="hover:bg-white/20"],
+  html.light [class*="hover:bg-\[#1a1a1a\]"],
+  html.light [class*="hover:bg-\[#1e1e1e\]"],
+  html.light [class*="hover:bg-\[#222\]"],
   html.light [class*="bg-white/5"],
   html.light [class*="bg-white/10"],
   html.light [class*="bg-white/20"] {
     @apply bg-[#F3F4F6] hover:bg-[#E5E7EB];
+  }
+
+  /* Admin table surfaces - Light Mode */
+  html.light table[class*="bg-\[#111\]"],
+  html.light table[class*="bg-\[#0a0a0a\]"],
+  html.light table[class*="bg-\[#1a1a1a\]"],
+  html.light table[class*="bg-\[#1e1e1e\]"],
+  html.light table[class*="bg-\[#222\]"] {
+    @apply bg-white;
+  }
+
+  html.light thead[class*="bg-\[#1a1a1a\]"],
+  html.light thead[class*="bg-\[#1e1e1e\]"],
+  html.light thead[class*="bg-\[#222\]"],
+  html.light tr[class*="hover:bg-\[#1a1a1a\]"],
+  html.light tr[class*="hover:bg-\[#1e1e1e\]"],
+  html.light tr[class*="hover:bg-\[#222\]"] {
+    @apply bg-[#F9FAFB];
   }
 
   /* Input Backgrounds - Light Mode */

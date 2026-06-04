@@ -24,6 +24,9 @@ interface Order {
   fulfillmentStatus: string;
   shippingAddress?: string;
   paymentMethod?: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
   createdAt: string;
   items: OrderItem[];
   user?: { username: string; email: string; phone: string };
@@ -155,9 +158,9 @@ export default function OrderDetailPage() {
 
               <div class="bill-to">
                 <h3>BILL TO:</h3>
-                <p><strong>${order.user?.username || "Customer"}</strong></p>
-                <p>${order.user?.email || "N/A"}</p>
-                <p>${order.user?.phone || "N/A"}</p>
+                <p><strong>${order.customerName || order.user?.username || order.customerEmail || "Customer"}</strong></p>
+                <p>${order.user?.email || order.customerEmail || "N/A"}</p>
+                <p>${order.user?.phone || order.customerPhone || "N/A"}</p>
                 <p>${order.shippingAddress || "N/A"}</p>
               </div>
 
@@ -312,15 +315,15 @@ export default function OrderDetailPage() {
             <div className="space-y-3 text-sm">
               <div>
                 <p className="text-gray-400 mb-1">Name</p>
-                <p className="text-white">{order.user?.username || "—"}</p>
+                <p className="text-white">{order.user?.username || order.customerEmail || "—"}</p>
               </div>
               <div>
                 <p className="text-gray-400 mb-1">Email</p>
-                <p className="text-white">{order.user?.email || "—"}</p>
+                <p className="text-white">{order.user?.email || order.customerEmail || "—"}</p>
               </div>
               <div>
                 <p className="text-gray-400 mb-1">Phone</p>
-                <p className="text-white">{order.user?.phone || "—"}</p>
+                <p className="text-white">{order.user?.phone || order.customerPhone || "—"}</p>
               </div>
               <div>
                 <p className="text-gray-400 mb-1">Shipping Address</p>

@@ -49,6 +49,9 @@ export class Order {
   paymentMethod: string;
 
   @Column({ nullable: true })
+  customerName: string;
+
+  @Column({ nullable: true })
   customerEmail: string;
 
   @Column({ nullable: true })

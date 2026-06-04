@@ -47,7 +47,7 @@ export default function Home() {
     <main className="dark:bg-BgWalaBlack light:bg-[#F9FAFB]">
       <Hero />
       <Products />
-      <Testimonial />
+      {/* <Testimonial /> */}
       <Mob_Nav />
     </main>
   );
