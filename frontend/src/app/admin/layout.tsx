@@ -86,7 +86,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* ── Desktop Sidebar ── */}
       <aside
         style={{ width: collapsed ? "68px" : "240px" }}
-        className="hidden lg:flex flex-col relative z-30 dark:bg-[#111] light:bg-white dark:border-white/10 light:border-[#E5E7EB] border-r transition-[width] duration-300 ease-in-out shrink-0 overflow-hidden"
+        className="hidden lg:flex flex-col relative z-30 dark:bg-[#111] light:bg-white dark:border-white/10 light:border-[#E5E7EB] border-r transition-[width] duration-300 ease-in-out shrink-0 overflow-visible"
       >
         {/* ── Logo Section ── */}
         <div className="flex items-center gap-3 px-4 py-5 dark:border-white/10 light:border-[#E5E7EB] border-b shrink-0 overflow-hidden">
@@ -115,7 +115,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   ${collapsed ? "justify-center px-0 py-2.5" : "px-3 py-2.5"}
                   ${active
                     ? "bg-[#F97316] text-white"
-                    : "dark:text-gray-400 light:text-[#6B7280] dark:hover:text-white light:hover:text-[#1F2937] dark:hover:bg-white/5 light:hover:bg-[#F3F4F6]"}
+                    : "dark:text-gray-400 light:text-[#6B7280] dark:hover:text-white light:hover:text-[#1F2937]"}
                 `}
               >
                 <span className="shrink-0">{item.icon}</span>
