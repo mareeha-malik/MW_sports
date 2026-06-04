@@ -14,28 +14,16 @@ async function bootstrap() {
   const isProduction = process.env.NODE_ENV === 'production';
   const frontendOrigin = process.env.FRONTEND_URL || 'https://mw-sports.vercel.app';
 
-  app.enableCors({
-    origin: (origin, callback) => {
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      const normalizedOrigin = origin.toLowerCase();
-      const allowedOrigins = [frontendOrigin.toLowerCase()];
-
-      if (
-        allowedOrigins.includes(normalizedOrigin) ||
-        (!isProduction && (normalizedOrigin.startsWith('http://localhost') || normalizedOrigin.startsWith('http://127.0.0.1')))
-      ) {
-        return callback(null, true);
-      }
-
-      return callback(new HttpException('CORS policy: origin not allowed', HttpStatus.FORBIDDEN), false);
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'User-Agent', 'Access-Control-Allow-Origin'],
-  });
+ app.enableCors({
+  origin: [
+    'https://mw-sports.vercel.app',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin'],
+});
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: false }));
   app.useGlobalFilters(new AllExceptionsFilter());
