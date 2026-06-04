@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './product.entity';
 import { Repository } from 'typeorm';
@@ -9,94 +13,118 @@ export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-    private readonly cloudinaryService: CloudinaryService, // Dependency injection for Cloudinary
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  // Retrieve all products (excluding soft-deleted)
   async findAll(): Promise<Product[]> {
-    return await this.productRepository.find({ withDeleted: false });
+    try {
+      return await this.productRepository.find({ withDeleted: false });
+    } catch (error) {
+      console.error('Product findAll failed', error);
+      throw new InternalServerErrorException('Unable to retrieve products');
+    }
   }
 
-  // Retrieve a single product by ID (excluding soft-deleted)
   async findOne(id: number): Promise<Product> {
-    const product = await this.productRepository.findOne({ where: { id }, withDeleted: false });
-    if (!product) {
-      throw new NotFoundException('Product not found');
+    try {
+      const product = await this.productRepository.findOne({ where: { id }, withDeleted: false });
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+      return product;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error('Product findOne failed', error);
+      throw new InternalServerErrorException('Unable to retrieve product');
     }
-    return product;
   }
 
-  // Create a new product
   async create(body, file?: Express.Multer.File): Promise<Product> {
-    let uploadedImgUrl = body.img || null;
+    try {
+      let uploadedImgUrl = body.img || null;
 
-    if (file) {
-      uploadedImgUrl = await this.cloudinaryService.uploadImage(file.path); // Upload file to Cloudinary
+      if (file) {
+        uploadedImgUrl = await this.cloudinaryService.uploadImage(file.path);
+      }
+
+      const newProduct = {
+        title: body.title,
+        description: body.description,
+        price: body.price !== undefined ? Number(body.price) : null,
+        stock: body.stock !== undefined ? Number(body.stock) : 0,
+        status: body.status || 'active',
+        badge: body.badge || null,
+        categoryId: body.categoryId !== undefined ? Number(body.categoryId) : null,
+        oldPrice: body.oldPrice !== undefined ? Number(body.oldPrice) : null,
+        rating: body.rating !== undefined ? Number(body.rating) : 0,
+        img: uploadedImgUrl,
+      };
+
+      return await this.productRepository.save(newProduct);
+    } catch (error) {
+      console.error('Product create failed', error);
+      throw new InternalServerErrorException('Unable to create product');
     }
-
-    const newProduct = {
-      title: body.title,
-      description: body.description,
-      price: body.price,
-      stock: body.stock || 0,
-      status: body.status || 'active',
-      badge: body.badge || null,
-      categoryId: body.categoryId || null,
-      oldPrice: body.oldPrice || null,
-      rating: body.rating || 0,
-      img: uploadedImgUrl,
-    };
-
-    return await this.productRepository.save(newProduct); // Save product to the database
   }
 
-  // Update an existing product by ID
   async update(id: number, body, file?: Express.Multer.File): Promise<Product> {
-    const product = await this.productRepository.findOne({ where: { id }, withDeleted: false });
+    try {
+      const product = await this.productRepository.findOne({ where: { id }, withDeleted: false });
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
 
-    if (!product) {
-      throw new NotFoundException('Product not found');
+      let updatedImg = product.img;
+      if (file) {
+        updatedImg = await this.cloudinaryService.uploadImage(file.path);
+      } else if (body.img) {
+        updatedImg = body.img;
+      }
+
+      const updatedProduct = {
+        ...product,
+        title: body.title ?? product.title,
+        description: body.description ?? product.description,
+        price: body.price !== undefined ? Number(body.price) : product.price,
+        stock: body.stock !== undefined ? Number(body.stock) : product.stock,
+        status: body.status ?? product.status,
+        badge: body.badge ?? product.badge,
+        categoryId: body.categoryId !== undefined ? Number(body.categoryId) : product.categoryId,
+        oldPrice: body.oldPrice !== undefined ? Number(body.oldPrice) : product.oldPrice,
+        rating: body.rating !== undefined ? Number(body.rating) : product.rating,
+        img: updatedImg,
+      };
+
+      await this.productRepository.update(id, updatedProduct);
+      const updated = await this.productRepository.findOne({ where: { id }, withDeleted: false });
+      if (!updated) {
+        throw new InternalServerErrorException('Updated product could not be loaded');
+      }
+      return updated;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error('Product update failed', error);
+      throw new InternalServerErrorException('Unable to update product');
     }
-
-    // Handle file upload if a new file is provided
-    let updatedImg = product.img;
-    if (file) {
-      updatedImg = await this.cloudinaryService.uploadImage(file.path);
-    } else if (body.img) {
-      updatedImg = body.img;
-    }
-
-    // Merge updated fields with existing product data
-    const updatedProduct = {
-      ...product,
-      title: body.title || product.title,
-      description: body.description || product.description,
-      price: body.price !== undefined ? body.price : product.price,
-      stock: body.stock !== undefined ? body.stock : product.stock,
-      status: body.status || product.status,
-      badge: body.badge || product.badge,
-      categoryId: body.categoryId !== undefined ? body.categoryId : product.categoryId,
-      oldPrice: body.oldPrice !== undefined ? body.oldPrice : product.oldPrice,
-      rating: body.rating !== undefined ? body.rating : product.rating,
-      img: updatedImg,
-    };
-
-    // Perform the update
-    await this.productRepository.update(id, updatedProduct);
-
-    // Return the updated product
-    return await this.productRepository.findOne({ where: { id }, withDeleted: false });
   }
 
-  // Soft delete a product by ID
   async remove(id: number): Promise<void> {
-    const product = await this.productRepository.findOne({ where: { id }, withDeleted: false });
-
-    if (!product) {
-      throw new NotFoundException('Product not found');
+    try {
+      const product = await this.productRepository.findOne({ where: { id }, withDeleted: false });
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+      await this.productRepository.softRemove(product);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error('Product remove failed', error);
+      throw new InternalServerErrorException('Unable to delete product');
     }
-
-    // Use soft delete (sets deletedAt timestamp)
-    await this.productRepository.softRemove(product);
   }
 }
