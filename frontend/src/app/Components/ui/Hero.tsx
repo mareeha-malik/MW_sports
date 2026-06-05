@@ -15,23 +15,23 @@ const Hero = () => {
   const Slide_Data = [
     {
       id: 0,
-      img: "/Hero_Main.svg",
+      img: "https://res.cloudinary.com/dugqqxf20/image/upload/v1780650464/WhatsApp_Image_2026-06-05_at_2.07.21_PM_jtr6od.jpg",
     },
     {
       id: 1,
-      img: "/Hero_Shirts.svg",
+      img: "https://res.cloudinary.com/dugqqxf20/image/upload/v1780647210/Hero_Shirts_ptmqam.svg",
     },
     {
       id:2,
-      img:"/Hero_Bats.svg",
+      img:"https://res.cloudinary.com/dugqqxf20/image/upload/v1780647170/Hero_All_Shirts_zkvold.svg",
     },
     {
       id:3,
-      img:"/Hero_Gears.svg",
+      img:"https://res.cloudinary.com/dugqqxf20/image/upload/v1780650344/WhatsApp_Image_2026-06-05_at_2.05.06_PM_gl6k9r.jpg",
     },
     {
       id:4,
-      img:"/Hero_All_Shirts.svg",
+      img:"https://res.cloudinary.com/dugqqxf20/image/upload/v1780650429/WhatsApp_Image_2026-06-05_at_2.06.47_PM_cn4nel.jpg",
     }
   ];
 

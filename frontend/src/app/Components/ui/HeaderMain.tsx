@@ -160,7 +160,7 @@ const HeaderMain = () => {
           <Link href="/" className="flex items-center gap-3 flex-shrink-0 group">
             <div className="relative">
               <img
-                src="Logo.svg"
+                src="https://res.cloudinary.com/dugqqxf20/image/upload/v1780647207/Logo_ytxswr.svg"
                 alt="Logo"
                 width={50}
                 height={50}
