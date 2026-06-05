@@ -141,7 +141,7 @@ export class AuthService {
       const confirmationLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?userId=${createdUser.id}`;
       await this.emailService.sendConfirmationEmail(email, username, confirmationLink);
     } catch (error) {
-      console.error('Failed to send confirmation email:', error);
+      console.warn('Failed to send confirmation email:', error);
       // Don't fail the signup if email fails to send
     }
 

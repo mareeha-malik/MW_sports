@@ -282,7 +282,8 @@ const HeaderMain = () => {
             {/* Hamburger Menu */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="dark:text-gray-400 light:text-[#6B7280] dark:hover:text-BrightOrange light:hover:text-BrightOrange transition-colors"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#E5E7EB] bg-white text-[#1F2937] shadow-sm transition hover:border-BrightOrange hover:text-BrightOrange dark:border-[#222] dark:bg-[#111] dark:text-white"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {mobileMenuOpen ? (
                 <X className="w-6 h-6 stroke-2" />
@@ -295,7 +296,7 @@ const HeaderMain = () => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden pb-4 dark:bg-BgWalaBlack light:bg-[#F9FAFB] dark:border-gray-800 light:border-[#E5E7EB] border-t max-h-[80vh] overflow-y-auto">
+          <div className="lg:hidden max-h-[80vh] overflow-y-auto border-t border-[#E5E7EB] bg-[#F9FAFB] pb-4 dark:border-gray-800 dark:bg-BgWalaBlack">
             {/* Search Bar Mobile */}
             <div className="mb-4 p-3">
               <div className="w-full relative">

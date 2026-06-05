@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, BeforeInsert } from 'typeorm';
 import { User } from '../user/user.entity';
 import { OrderItem } from './order-item.entity';
 
@@ -21,7 +21,7 @@ export class Order {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   orderNumber: string;
 
   @ManyToOne(() => User, (user) => user.orders)
@@ -62,4 +62,13 @@ export class Order {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @BeforeInsert()
+  generateOrderNumber() {
+    if (!this.orderNumber) {
+      const timestamp = Date.now().toString();
+      const randomSuffix = Math.random().toString(36).slice(2, 8).toUpperCase();
+      this.orderNumber = `ORD-${timestamp}-${randomSuffix}`;
+    }
+  }
 }

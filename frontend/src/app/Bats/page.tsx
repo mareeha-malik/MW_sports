@@ -15,7 +15,7 @@ const Bats = () => {
     return (
         <div className="container pt-16 pb-16">
             <h2 className="font-medium text-2xl pb-4">Bats</h2>
-            <div className="grid grid-cols-1 place-items-center sm:place-items-start sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 xl:gap-x-20 xl:gap-y-10">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-10 xl:gap-y-10">
                 {Bats_data.map((item, index) => 
                     <Product_Card
                         key={index}

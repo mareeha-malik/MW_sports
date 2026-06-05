@@ -82,7 +82,7 @@ const Products = () => {
   };
 
   return (
-    <section className="dark:bg-BgWalaBlack light:bg-[#F9FAFB] py-20">
+    <section className="dark:bg-BgWalaBlack light:bg-[#F9FAFB] py-12 md:py-20">
       <div className="container">
         {sortedBadges.map((badge, sectionIdx) => {
           const itemsInSection = groupedProducts[badge].length;
@@ -95,19 +95,19 @@ const Products = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: sectionIdx * 0.1 }}
-              className="mb-24"
+              className="mb-16 md:mb-24"
             >
               {/* Section Header with Navigation */}
-              <div className="flex items-center justify-between mb-12">
+              <div className="mb-6 flex items-center justify-between md:mb-12">
                 <motion.div
                   initial={{ opacity: 0, x: -30 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                 >
-                  <h2 className="text-5xl font-black dark:text-white light:text-[#1F2937]">
+                  <h2 className="text-2xl font-black dark:text-white light:text-[#1F2937] md:text-5xl">
                     {badge === "No Label" ? "ALL PRODUCTS" : `${badge} PRODUCTS`}
                   </h2>
-                  <p className="dark:text-gray-600 light:text-[#6B7280] mt-2">
+                  <p className="mt-1 text-sm dark:text-gray-600 light:text-[#6B7280] md:mt-2 md:text-base">
                     {badge === "HOT" && "Trending now - Shop the hottest items"}
                     {badge === "NEW" && "Explore the latest drops with premium build quality"}
                     {badge === "SALE" && "Get amazing discounts on selected items"}
@@ -117,7 +117,7 @@ const Products = () => {
                 </motion.div>
 
                 {/* Navigation Buttons */}
-                <div className="flex gap-3">
+                <div className="hidden gap-3 md:flex">
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
@@ -137,12 +137,30 @@ const Products = () => {
                 </div>
               </div>
 
+              {/* Mobile Grid */}
+              <div className="grid grid-cols-2 gap-3 md:hidden">
+                {groupedProducts[badge].map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    img={product.img}
+                    title={product.title}
+                    desc={product.description}
+                    rating={product.rating}
+                    price={product.price}
+                    oldPrice={product.oldPrice}
+                    id={product.id}
+                    badge={product.badge}
+                    category={product.category}
+                  />
+                ))}
+              </div>
+
               {/* Carousel Container */}
-              <div className="relative overflow-hidden">
+              <div className="relative hidden overflow-hidden md:block">
                 <motion.div
                   animate={{ x: `-${currentPos * 20}%` }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className="flex gap-6"
+                  className="flex gap-4 lg:gap-6"
                 >
                   {groupedProducts[badge].map((product, idx) => (
                     <motion.div
@@ -167,7 +185,7 @@ const Products = () => {
               </div>
 
               {/* Slide Indicators */}
-              <div className="flex justify-center gap-2 mt-8">
+              <div className="mt-6 hidden justify-center gap-2 md:flex md:mt-8">
                 {[...Array(Math.max(1, itemsInSection - 4))].map((_, idx) => (
                   <motion.button
                     key={idx}

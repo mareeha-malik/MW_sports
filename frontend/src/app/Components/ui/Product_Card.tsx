@@ -129,20 +129,20 @@ const ProductCard: React.FC<PropsType> = ({
   return (
     <Link
       href={`/product/${id}`}
-      className="group relative flex flex-col w-[220px] rounded-2xl overflow-hidden
-        dark:bg-[#111] light:bg-white dark:border-[#222] light:border-[#E5E7EB] border transition-all duration-300
+      className="group relative flex w-full min-w-0 flex-col overflow-hidden rounded-2xl
+        border dark:border-[#222] light:border-[#E5E7EB] dark:bg-[#111] light:bg-white transition-all duration-300
         hover:-translate-y-1 dark:hover:border-orange-500 light:hover:border-orange-500
         dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.6),0_0_0_1px_rgb(249,115,22)] light:hover:shadow-[0_20px_40px_rgba(0,0,0,0.1),0_0_0_1px_rgb(249,115,22)]"
     >
       {/* Image area */}
-      <div className="relative h-56 dark:bg-gradient-to-br dark:from-[#1a1a1a] dark:to-[#0d0d0d] light:bg-gradient-to-br light:from-[#F3F4F6] light:to-[#E5E7EB] flex items-center justify-center overflow-hidden">
+      <div className="relative flex h-32 items-center justify-center overflow-hidden dark:bg-gradient-to-br dark:from-[#1a1a1a] dark:to-[#0d0d0d] light:bg-gradient-to-br light:from-[#F3F4F6] light:to-[#E5E7EB] sm:h-40 lg:h-48">
 
         {/* Gradient overlay at bottom */}
         <div className="absolute bottom-0 inset-x-0 h-12 dark:bg-gradient-to-t dark:from-[#111] light:bg-gradient-to-t light:from-white light:to-white/0 dark:to-transparent z-10 pointer-events-none" />
 
         {/* Badge */}
         {badge && (
-          <span className="absolute top-3 left-3 z-20 bg-orange-500 text-white text-[10px] font-bold tracking-[1.5px] uppercase px-2.5 py-1 rounded-[4px]">
+          <span className="absolute left-3 top-3 z-20 rounded-[4px] bg-orange-500 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[1.5px] text-white">
             {badge}
           </span>
         )}
@@ -152,9 +152,8 @@ const ProductCard: React.FC<PropsType> = ({
           type="button"
           onClick={toggleLike}
           aria-label={isLiked ? "Remove from wishlist" : "Add to wishlist"}
-          className="absolute top-2.5 right-2.5 z-20 w-8 h-8 rounded-full
-            bg-black/70 border border-[#333] flex items-center justify-center
-            text-orange-500 transition hover:bg-orange-500/10 text-sm"
+          className="absolute right-2.5 top-2.5 z-20 flex h-8 w-8 items-center justify-center rounded-full
+            border border-[#333] bg-black/70 text-sm text-orange-500 transition hover:bg-orange-500/10"
         >
           {isLiked ? <FaHeart /> : <FaRegHeart />}
         </button>
@@ -172,23 +171,23 @@ const ProductCard: React.FC<PropsType> = ({
       </div>
 
       {/* Body */}
-      <div className="flex flex-col flex-1 px-3 pb-3 pt-2.5 gap-1.5">
+      <div className="flex flex-1 flex-col gap-1 px-2.5 pb-2.5 pt-2 sm:px-3 sm:pb-3">
 
         {/* Category label */}
         {category && (
-          <p className="text-[8px] font-semibold tracking-[1.5px] text-orange-500 uppercase">
+          <p className="text-[7px] font-semibold uppercase tracking-[1.5px] text-orange-500 sm:text-[8px]">
             {typeof category === 'string' ? category : category.name}
           </p>
         )}
 
         {/* Title */}
-        <h3 className="text-[15px] font-semibold text-white leading-tight line-clamp-2">
+        <h3 className="line-clamp-2 text-[12px] font-semibold leading-tight text-white sm:text-[13px] lg:text-[14px]">
           {title}
         </h3>
 
         {/* Divider */}
         <div
-          className="h-px my-0.5 opacity-30"
+          className="my-0.5 h-px opacity-30"
           style={{
             background: "linear-gradient(to right, transparent, #F97316, transparent)",
           }}
@@ -203,19 +202,19 @@ const ProductCard: React.FC<PropsType> = ({
         <div className="flex gap-0.5">
           {Array.from({ length: 5 }, (_, i) =>
             i < Math.floor(Number(rating) || 0)
-              ? <FaStar key={i} className="text-orange-500 text-[10px]" />
-              : <FaRegStar key={i} className="text-[#333] text-[10px]" />
+              ? <FaStar key={i} className="text-[9px] text-orange-500" />
+              : <FaRegStar key={i} className="text-[9px] text-[#333]" />
           )}
         </div>
 
         {/* Price + CTA */}
-        <div className="flex items-center justify-between mt-auto pt-1">
-          <div className="flex items-baseline gap-2">
-            <span className="text-white text-[15px] font-semibold">
+        <div className="mt-auto flex items-center justify-between pt-1">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-[12px] font-semibold text-white sm:text-[13px] lg:text-[14px]">
               Rs {displayPrice}
             </span>
             {oldPriceNum !== null && (
-              <span className="text-[10px] text-[#444] line-through">
+              <span className="text-[8px] text-[#444] line-through sm:text-[9px]">
                 Rs {oldPriceNum}
               </span>
             )}
@@ -225,8 +224,7 @@ const ProductCard: React.FC<PropsType> = ({
             type="button"
             onClick={handleAddToCart}
             aria-label="Add to cart"
-            className={`active:scale-95 text-white text-[12px] font-semibold tracking-[0.5px]
-              w-9 h-9 rounded-lg transition-all duration-150 flex items-center justify-center
+            className={`flex h-7 w-7 items-center justify-center rounded-lg text-[11px] font-semibold tracking-[0.5px] text-white transition-all duration-150 active:scale-95 sm:h-8 sm:w-8
               ${showAdded ? "bg-orange-500 hover:bg-orange-600" : "bg-orange-500 hover:bg-orange-600"}
               ${isAddingToCart ? "opacity-80 cursor-wait" : ""}`}
           >

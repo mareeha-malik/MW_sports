@@ -174,19 +174,18 @@ export default function CategoryPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => (
-            <div key={product.id} className="flex justify-center">
-              <ProductCard
-                img={product.img}
-                title={product.title}
-                desc={product.description}
-                rating={product.rating}
-                price={product.price}
-                oldPrice={product.oldPrice}
-                id={product.id}
-              />
-            </div>
+            <ProductCard
+              key={product.id}
+              img={product.img}
+              title={product.title}
+              desc={product.description}
+              rating={product.rating}
+              price={product.price}
+              oldPrice={product.oldPrice}
+              id={product.id}
+            />
           ))}
         </div>
       )}

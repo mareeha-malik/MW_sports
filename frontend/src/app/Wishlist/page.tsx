@@ -77,19 +77,18 @@ const WishlistPage = () => {
       ) : products.length === 0 ? (
         <div className="dark:text-gray-300 light:text-[#6B7280]">No wishlist items found.</div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
+        <div className="grid grid-cols-2 items-stretch gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
           {products.map((product) => (
-            <div key={product.id} className="flex justify-center">
-              <ProductCard
-                img={product.img}
-                title={product.title}
-                desc={product.description}
-                rating={product.rating}
-                price={product.price}
-                oldPrice={product.oldPrice}
-                id={product.id}
-              />
-            </div>
+            <ProductCard
+              key={product.id}
+              img={product.img}
+              title={product.title}
+              desc={product.description}
+              rating={product.rating}
+              price={product.price}
+              oldPrice={product.oldPrice}
+              id={product.id}
+            />
           ))}
         </div>
       )}

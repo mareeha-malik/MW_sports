@@ -1,18 +1,44 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
-export class EmailService {
+export class EmailService implements OnModuleInit {
   private transporter: nodemailer.Transporter;
 
   constructor() {
+    const hasEmailUser = Boolean(process.env.EMAIL_USER);
+    console.log(`[EmailService] EMAIL_USER configured: ${hasEmailUser}`);
+
     this.transporter = nodemailer.createTransport({
-      service: process.env.EMAIL_SERVICE || 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASSWORD,
       },
+      connectionTimeout: 10000,
+      socketTimeout: 10000,
+      greetingTimeout: 10000,
     });
+  }
+
+  async onModuleInit(): Promise<void> {
+    try {
+      await this.transporter.verify();
+      console.log('[EmailService] SMTP connection verified successfully');
+    } catch (error) {
+      console.warn('[EmailService] SMTP verification failed:', error?.message || error);
+    }
+  }
+
+  private async sendMailSafe(mailOptions: nodemailer.SendMailOptions, context: string): Promise<void> {
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log(`[EmailService] ${context} email sent successfully`);
+    } catch (error) {
+      console.warn(`[EmailService] ${context} email failed:`, error?.message || error);
+    }
   }
 
   async sendConfirmationEmail(email: string, username: string, confirmationLink: string): Promise<void> {
@@ -29,7 +55,7 @@ export class EmailService {
       `,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    await this.sendMailSafe(mailOptions, 'signup confirmation');
   }
 
   async sendOrderConfirmationEmail(email: string, customerName: string, orderNumber: string, orderDetails: any): Promise<void> {
@@ -75,7 +101,7 @@ export class EmailService {
       `,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    await this.sendMailSafe(mailOptions, 'order confirmation');
   }
 
   async sendOrderStatusEmail(email: string, customerName: string, orderNumber: string, status: string, additionalInfo?: string): Promise<void> {
@@ -109,7 +135,7 @@ export class EmailService {
       `,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    await this.sendMailSafe(mailOptions, 'order status');
   }
 
   async sendLowStockNotificationEmail(adminEmail: string, productName: string, currentStock: number): Promise<void> {
@@ -130,6 +156,6 @@ export class EmailService {
       `,
     };
 
-    await this.transporter.sendMail(mailOptions);
+    await this.sendMailSafe(mailOptions, 'low stock notification');
   }
 }

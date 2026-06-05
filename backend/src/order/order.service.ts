@@ -92,7 +92,7 @@ export class OrderService {
         orderDetails
       );
     } catch (error) {
-      console.error('Failed to send order confirmation email:', error);
+      console.warn('Failed to send order confirmation email:', error);
       // Don't fail the order creation if email fails
     }
 
@@ -133,7 +133,7 @@ export class OrderService {
           fulfillmentStatus,
         );
       } catch (error) {
-        console.error('Failed to send order status email:', error);
+        console.warn('Failed to send order status email:', error);
         // Don't fail the status update if email fails
       }
     }

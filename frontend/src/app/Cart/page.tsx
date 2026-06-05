@@ -117,51 +117,106 @@ const CartPage = () => {
           {!items.length ? (
             <p className="dark:text-gray-400 light:text-[#6B7280]">Your cart is empty.</p>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-3 md:space-y-6">
               {items.map((item) => (
-                <div key={item.id ?? item.product.id} className="flex flex-col md:flex-row gap-4 dark:bg-HeaderWalaBlack light:bg-white dark:rounded-xl light:rounded-xl p-4 dark:border dark:border-[#333] light:border light:border-[#E5E7EB]">
-                  <div className="w-full md:w-32 h-32 rounded-lg overflow-hidden dark:bg-black/20 light:bg-[#F3F4F6]">
-                    {item.product.img ? (
-                      <img
-                        src={item.product.img}
-                        alt={item.product.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-700 light:bg-gradient-to-br light:from-gray-200 light:to-gray-100 dark:text-gray-300 light:text-gray-600 text-xs">
-                        No Image
+                <>
+                  <div key={item.id ?? item.product.id} className="md:hidden rounded-xl border border-[#E5E7EB] bg-white p-3 shadow-sm dark:border-[#222] dark:bg-[#111]">
+                    <div className="flex items-start gap-3">
+                      <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[#F3F4F6] dark:bg-black/20">
+                        {item.product.img ? (
+                          <img
+                            src={item.product.img}
+                            alt={item.product.title}
+                            className="h-full w-full object-contain p-1"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-[10px] text-gray-500 dark:text-gray-300">
+                            No Image
+                          </div>
+                        )}
                       </div>
-                    )}
+
+                      <div className="min-w-0 flex-1">
+                        <h2 className="truncate text-sm font-semibold text-[#1F2937] dark:text-white">
+                          {item.product.title}
+                        </h2>
+                        <p className="mt-1 text-xs text-[#6B7280] dark:text-gray-400">Rs {item.product.price}</p>
+
+                        <div className="mt-2 flex items-center gap-2">
+                          <button
+                            className="flex h-7 w-7 items-center justify-center rounded-md border border-[#D1D5DB] text-[#1F2937] transition hover:bg-[#F3F4F6] dark:border-[#333] dark:text-white dark:hover:bg-[#1a1a1a]"
+                            onClick={() => handleQuantityChange(item, item.quantity - 1)}
+                          >
+                            -
+                          </button>
+                          <span className="min-w-4 text-center text-sm font-medium text-[#1F2937] dark:text-white">
+                            {item.quantity}
+                          </span>
+                          <button
+                            className="flex h-7 w-7 items-center justify-center rounded-md border border-[#D1D5DB] text-[#1F2937] transition hover:bg-[#F3F4F6] dark:border-[#333] dark:text-white dark:hover:bg-[#1a1a1a]"
+                            onClick={() => handleQuantityChange(item, item.quantity + 1)}
+                          >
+                            +
+                          </button>
+
+                          <div className="ml-auto text-right">
+                            <p className="text-xs font-semibold text-[#1F2937] dark:text-white">Rs {item.product.price * item.quantity}</p>
+                            <button
+                              className="mt-1 text-[11px] font-medium text-red-500 hover:text-red-400"
+                              onClick={() => handleRemove(item)}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h2 className="text-xl font-medium dark:text-white light:text-[#1F2937]">{item.product.title}</h2>
-                    <p className="dark:text-gray-400 light:text-[#6B7280]">Rs {item.product.price}</p>
-                    <div className="flex items-center gap-3 mt-4">
+
+                  <div key={`${item.id ?? item.product.id}-desktop`} className="hidden flex-col gap-4 rounded-xl border border-[#E5E7EB] bg-white p-4 dark:border-[#333] dark:bg-HeaderWalaBlack md:flex md:flex-row">
+                    <div className="h-32 w-full overflow-hidden rounded-lg dark:bg-black/20 light:bg-[#F3F4F6] md:w-32">
+                      {item.product.img ? (
+                        <img
+                          src={item.product.img}
+                          alt={item.product.title}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-xs text-gray-300 light:text-gray-600 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-700 light:bg-gradient-to-br light:from-gray-200 light:to-gray-100">
+                          No Image
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h2 className="text-xl font-medium dark:text-white light:text-[#1F2937]">{item.product.title}</h2>
+                      <p className="dark:text-gray-400 light:text-[#6B7280]">Rs {item.product.price}</p>
+                      <div className="mt-4 flex items-center gap-3">
+                        <button
+                          className="rounded border px-3 py-1 dark:border-gray-600 dark:text-white light:border-[#D1D5DB] light:text-[#1F2937] dark:hover:bg-[#222] light:hover:bg-[#F3F4F6]"
+                          onClick={() => handleQuantityChange(item, item.quantity - 1)}
+                        >
+                          -
+                        </button>
+                        <span className="dark:text-white light:text-[#1F2937]">{item.quantity}</span>
+                        <button
+                          className="rounded border px-3 py-1 dark:border-gray-600 dark:text-white light:border-[#D1D5DB] light:text-[#1F2937] dark:hover:bg-[#222] light:hover:bg-[#F3F4F6]"
+                          onClick={() => handleQuantityChange(item, item.quantity + 1)}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-start justify-between md:items-end">
+                      <span className="font-semibold dark:text-white light:text-[#1F2937]">Rs {item.product.price * item.quantity}</span>
                       <button
-                        className="dark:border-gray-600 light:border-[#D1D5DB] border px-3 py-1 rounded dark:text-white light:text-[#1F2937] dark:hover:bg-[#222] light:hover:bg-[#F3F4F6]"
-                        onClick={() => handleQuantityChange(item, item.quantity - 1)}
+                        className="mt-2 text-red-400 hover:text-red-300"
+                        onClick={() => handleRemove(item)}
                       >
-                        -
-                      </button>
-                      <span className="dark:text-white light:text-[#1F2937]">{item.quantity}</span>
-                      <button
-                        className="dark:border-gray-600 light:border-[#D1D5DB] border px-3 py-1 rounded dark:text-white light:text-[#1F2937] dark:hover:bg-[#222] light:hover:bg-[#F3F4F6]"
-                        onClick={() => handleQuantityChange(item, item.quantity + 1)}
-                      >
-                        +
+                        Remove
                       </button>
                     </div>
                   </div>
-                  <div className="flex flex-col justify-between items-start md:items-end">
-                    <span className="dark:text-white light:text-[#1F2937] font-semibold">Rs {item.product.price * item.quantity}</span>
-                    <button
-                      className="text-red-400 hover:text-red-300 mt-2"
-                      onClick={() => handleRemove(item)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
+                </>
               ))}
             </div>
           )}

@@ -1,12 +1,13 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../utils/api";
 import { addGuestCartItem } from "../../utils/cart";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import ProductCard from "../../Components/ui/Product_Card";
 import toast from "react-hot-toast";
+import { ChevronLeft, Menu, Share2 } from "lucide-react";
 
 interface Product {
   id: number;
@@ -29,12 +30,15 @@ interface Review {
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [quantity, setQuantity] = useState<number>(1);
+  const [menuOpen, setMenuOpen] = useState<boolean>(false);
   
   // Review form states
   const [rating, setRating] = useState<number>(0);
@@ -106,12 +110,38 @@ const ProductDetails = () => {
     if (!product) return;
     const token = localStorage.getItem("access_token");
     if (token) {
-      await axiosInstance.post("/cart/add", { productId: product.id, quantity: 1 });
+      await axiosInstance.post("/cart/add", { productId: product.id, quantity });
       window.dispatchEvent(new Event("cart:updated"));
       return;
     }
 
-    addGuestCartItem(product.id, 1);
+    addGuestCartItem(product.id, quantity);
+  };
+
+  const handleShare = async () => {
+    if (!product) return;
+
+    const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: product.title,
+          text: product.description,
+          url: shareUrl,
+        });
+      } catch (error) {
+        // User cancelled the share sheet.
+      }
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Product link copied");
+    } catch (error) {
+      toast.error("Could not copy link");
+    }
   };
 
   const handleSubmitReview = async () => {
@@ -158,62 +188,157 @@ const ProductDetails = () => {
   };
 
   return (
-    <div className="container mx-auto py-16 px-4 md:px-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        <div className="dark:border-white light:border-[#D1D5DB] border p-8 rounded-xl shadow-lg dark:bg-[#111] light:bg-white">
-        <div className="p-8 rounded-xl shadow-lg">
-          {product.img ? (
-            <img
-              src={product.img}
-              alt={product.title}
-              className="w-full h-auto object-cover rounded-xl"
-            />
-          ) : (
-            <div className="flex h-64 items-center justify-center rounded-xl dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-700 light:bg-gradient-to-br light:from-gray-200 light:to-gray-100 dark:text-gray-300 light:text-gray-600">
-              No Image
+    <div className="mx-auto w-full max-w-5xl px-2 pb-20 pt-2 sm:px-4 md:px-8 md:pb-16 md:pt-8">
+      <div className="mb-3 flex items-center justify-between lg:hidden">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-[#E5E7EB] bg-white text-[#1F2937] shadow-sm transition hover:border-BrightOrange hover:text-BrightOrange dark:border-[#222] dark:bg-[#111] dark:text-white"
+          aria-label="Go back"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setMenuOpen((value) => !value)}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[#E5E7EB] bg-white text-[#1F2937] shadow-sm transition hover:border-BrightOrange hover:text-BrightOrange dark:border-[#222] dark:bg-[#111] dark:text-white"
+            aria-label="Open product menu"
+          >
+            <Menu className="h-4 w-4" />
+          </button>
+
+          {menuOpen && (
+            <div className="absolute right-0 top-[3rem] z-20 w-40 overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-xl dark:border-[#222] dark:bg-[#111]">
+              <button
+                type="button"
+                onClick={handleShare}
+                className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-[#1F2937] transition hover:bg-[#F3F4F6] dark:text-white dark:hover:bg-[#1a1a1a]"
+              >
+                <Share2 className="h-3.5 w-3.5" />
+                Share product
+              </button>
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-[#1F2937] transition hover:bg-[#F3F4F6] dark:text-white dark:hover:bg-[#1a1a1a]"
+              >
+                Add to cart
+              </button>
             </div>
           )}
-        </div>        </div>
+        </div>
+      </div>
 
-        <div className="flex flex-col justify-between space-y-6">
-          <div>
-            <h1 className="text-4xl font-bold dark:text-white light:text-[#1F2937] mb-2">
-              {product.title}
-            </h1>
-
-            <div className="flex items-center space-x-2 mb-4">
-              {renderRating(reviews.length > 0 ? Math.round(getAverageRating()) : product.rating)}
-              <span className="dark:text-gray-500 light:text-[#9CA3AF]">
-                {reviews.length > 0 
-                  ? `(${getAverageRating()} / 5) • ${reviews.length} review${reviews.length !== 1 ? 's' : ''}`
-                  : `(${product.rating} / 5)`
-                }
-              </span>
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8">
+        <div className="space-y-3">
+          <div className="overflow-hidden rounded-xl bg-white shadow-[0_10px_22px_rgba(0,0,0,0.04)] dark:bg-[#111]">
+            <div className="flex items-center justify-center bg-[#F8FAFC] px-3 py-4 dark:bg-[#121212] sm:px-6 sm:py-6 md:px-8 md:py-8">
+              <img
+                src={product.img}
+                alt={product.title}
+                className="h-[180px] w-full max-w-[220px] object-contain sm:h-[240px] sm:max-w-[280px] md:h-[320px] md:max-w-[320px]"
+              />
             </div>
-
-           
-
-            <div className="flex items-center space-x-4">
-              <span className="text-3xl font-bold text-BrightOrange">
-                Rs {product.price}
-              </span>
-              <del className="dark:text-gray-500 light:text-[#9CA3AF] text-xl">
-                Rs {product.price + 500}
-              </del>
-            </div>
-             <p className="dark:text-gray-400 light:text-[#6B7280] leading-relaxed mb-4">
-              {product.description}
-            </p>
           </div>
 
-          <div className="flex space-x-4">
+          <div className="flex items-center justify-between gap-3 rounded-xl bg-white px-3 py-2.5 shadow-sm dark:bg-[#111]">
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.18em] text-[#9CA3AF]">Qty</p>
+              <div className="mt-1.5 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                  className="flex h-7 w-7 items-center justify-center rounded-md bg-[#F3F4F6] text-sm font-semibold text-[#1F2937] dark:bg-[#1a1a1a] dark:text-white"
+                >
+                  -
+                </button>
+                <span className="w-4 text-center text-sm font-semibold text-[#1F2937] dark:text-white">{quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity((value) => value + 1)}
+                  className="flex h-7 w-7 items-center justify-center rounded-md bg-[#F3F4F6] text-sm font-semibold text-[#1F2937] dark:bg-[#1a1a1a] dark:text-white"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <div className="text-right">
+              <p className="text-[9px] uppercase tracking-[0.18em] text-[#9CA3AF]">Rating</p>
+              <div className="mt-1.5 flex justify-end gap-0.5 text-[10px]">
+                {renderRating(reviews.length > 0 ? Math.round(getAverageRating()) : product.rating)}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3 rounded-xl bg-white p-3 shadow-[0_10px_22px_rgba(0,0,0,0.04)] dark:bg-[#111] sm:p-5 md:p-6">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-BrightOrange">
+              Product details
+            </p>
+            <h1 className="mt-1.5 text-xl font-black leading-tight text-[#1F2937] dark:text-white sm:text-2xl md:text-3xl">
+              {product.title}
+            </h1>
+          </div>
+
+          <div className="flex items-end gap-2">
+            <span className="text-xl font-black text-BrightOrange sm:text-2xl">
+              Rs {product.price}
+            </span>
+            <del className="pb-0.5 text-xs text-[#9CA3AF] dark:text-gray-500 sm:text-sm">
+              Rs {product.price + 500}
+            </del>
+          </div>
+
+          <p className="max-w-xl text-[13px] leading-relaxed text-[#6B7280] dark:text-gray-400 sm:text-sm">
+            {product.description}
+          </p>
+
+          <div className="flex items-center gap-2 text-[11px] text-[#1F2937] dark:text-gray-300">
+            <span className="rounded-full bg-[#F3F4F6] px-2.5 py-1.5 dark:bg-[#1a1a1a]">Easy returns</span>
+            <span className="rounded-full bg-[#F3F4F6] px-2.5 py-1.5 dark:bg-[#1a1a1a]">Secure checkout</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <button
-              className="bg-BrightOrange text-white py-3 px-8 rounded-full shadow-md hover:bg-orange-600 transition duration-300"
+              className="rounded-lg bg-BrightOrange px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-orange-500/15 transition hover:bg-orange-600"
               onClick={handleAddToCart}
             >
               Add to Cart
             </button>
-            <button className="dark:bg-gray-800 light:bg-[#E5E7EB] dark:text-white light:text-[#1F2937] py-3 px-8 rounded-full shadow-md dark:hover:bg-gray-900 light:hover:bg-[#D1D5DB] transition duration-300">
+            <button className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-2.5 text-sm font-semibold text-[#1F2937] shadow-sm transition hover:border-BrightOrange hover:text-BrightOrange dark:border-[#222] dark:bg-[#111] dark:text-white dark:hover:border-BrightOrange">
+              Buy Now
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 rounded-xl bg-[#F8FAFC] px-3 py-2.5 dark:bg-[#0f0f0f]">
+            {renderRating(reviews.length > 0 ? Math.round(getAverageRating()) : product.rating)}
+            <span className="text-xs text-[#6B7280] dark:text-gray-500">
+              {reviews.length > 0
+                ? `(${getAverageRating()} / 5) • ${reviews.length} review${reviews.length !== 1 ? 's' : ''}`
+                : `(${product.rating} / 5)`}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[#E5E7EB] bg-white/95 px-3 py-2.5 backdrop-blur-xl dark:border-[#222] dark:bg-[#0e0e0e]/95 md:hidden">
+        <div className="mx-auto flex max-w-md items-center gap-2.5">
+          <div className="min-w-0 flex-1">
+            <p className="text-[9px] uppercase tracking-[0.18em] text-[#9CA3AF]">Total price</p>
+            <p className="truncate text-lg font-black text-BrightOrange">Rs {product.price * quantity}</p>
+          </div>
+          <div className="grid flex-1 grid-cols-2 gap-2">
+            <button
+              onClick={handleAddToCart}
+              className="rounded-lg bg-BrightOrange px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-orange-500/15 transition hover:bg-orange-600"
+            >
+              Add to Cart
+            </button>
+            <button className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-2.5 text-sm font-semibold text-[#1F2937] transition hover:border-BrightOrange hover:text-BrightOrange dark:border-[#222] dark:bg-[#111] dark:text-white dark:hover:border-BrightOrange">
               Buy Now
             </button>
           </div>
@@ -221,9 +346,9 @@ const ProductDetails = () => {
       </div>
 
       {recommendedProducts.length > 0 && (
-        <div className="mt-16">
-          <h2 className="text-3xl font-bold dark:text-white light:text-[#1F2937] mb-8">Recommended Products</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="mt-10 md:mt-16">
+          <h2 className="mb-4 text-xl font-bold text-[#1F2937] dark:text-white sm:text-2xl">Recommended Products</h2>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
             {recommendedProducts.map((product) => (
               <ProductCard
                 key={product.id}
